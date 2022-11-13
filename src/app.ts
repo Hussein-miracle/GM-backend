@@ -54,7 +54,7 @@ const init = () => {
 
 
     socket.on('create-meet',() => {
-      const meetUid = `${nanoid(3)}-${nanoid(4)}-${nanoid(3)}`;
+      const meetUid = `${nanoid(3)}-${nanoid(4)}-${nanoid(3)}`.toLowerCase();
       console.log(meetUid,'meetUid')
   
       const meetData = {
