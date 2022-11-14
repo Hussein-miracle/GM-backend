@@ -1,32 +1,43 @@
-import { Schema,model } from "mongoose";
-
+import { Schema, model } from "mongoose";
 
 const userSchema = new Schema({
-  name:{
-    type:String,
-    required:true,
+  name: {
+    type: String,
+    required: true,
+    // unique: true,
+  },
+  meetCreator:{
+    type:Boolean,    
+    default:false
   },
   email: {
     type: String,
   },
-  screen:{
-    type:Boolean,
-    default:true,
-  },
-  voice:{
-    type:Boolean,
-    default:false,
+  settings: {
+    screen: {
+      type: Boolean,
+      default: false,
+    },
+    voice: {
+      type: Boolean,
+      default: false,
+    },
+    cam: {
+      type: Boolean,
+      default: true,
+    },
   },
   password: {
     type: String,
   },
-  meetings:[
+  meetings: [
     {
-      ref:'Meeting',
+      type: Schema.Types.ObjectId,
+      ref: "Meeting",
     }
-  ]
-})
+  ],
+});
 
-const userModel = model('User',userSchema);
+const userModel = model("User", userSchema);
 
 export default userModel;
