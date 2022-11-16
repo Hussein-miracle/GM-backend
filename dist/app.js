@@ -9,6 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 import express from "express";
 import * as mongoose from "mongoose";
+import cors from 'cors';
 import chalk from "chalk";
 import socketConnection from "./socket.js";
 import { nanoid } from "nanoid";
@@ -22,15 +23,17 @@ const app = express();
 // console.log(process.env.NODE_ENV) 
 // console.log(path.resolve('../.env').replace(/\\/g,'/'))
 app.use(express.urlencoded({ extended: false }));
+app.use(cors());
+app.get('/', (req, res, next) => {
+    res.status(200).json({
+        state: 'connected',
+        message: 'How far,babyyy ⚡⚡😍😍  ',
+    });
+});
 app.use((req, res, next) => {
-    res.setHeader("Access-Control-Allow-Origin", "*");
-    res.setHeader("Access-Control-Allow-Headers", "Content-Type,Authorization");
-    res.setHeader("Access-Control-Allow-Methods", "GET,PUT,PATCH,DELETE,POST");
-    //THIS IS  ALLOWED TO LET ANY DOMAIN HAVE ACCESS TO OUR API EMDPINTS
-    // if(req/)
-    if (req.method === "OPTIONS") {
-        return res.sendStatus(200);
-    }
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'OPTIONS, GET, POST, PUT, PATCH, DELETE');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
     next();
 });
 const init = () => {

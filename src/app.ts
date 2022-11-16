@@ -18,14 +18,14 @@ const app = express();
 // app.use(bodyParser.json());
 // console.log(process.env.NODE_ENV) 
 // console.log(path.resolve('../.env').replace(/\\/g,'/'))
-app.use(express.urlencoded({ extended: false }));
+app.use(express.urlencoded({extended: false }));
 
 app.use(cors());
 
 app.get('/',(req,res,next) => {
   res.status(200).json({
     state:'connected',
-    message:'How far,babyyy ⚡⚡😍😍',
+    message:'How far,babyyy ⚡⚡😍😍  ',
   })
 })
 
