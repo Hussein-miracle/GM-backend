@@ -19,6 +19,13 @@ const app = express();
 // console.log(path.resolve('../.env').replace(/\\/g,'/'))
 app.use(express.urlencoded({ extended: false }));
 
+app.get('/',(req,res,next) => {
+  res.status(200).json({
+    state:'connected',
+    message:'How far,babyyy ⚡⚡😍😍',
+  })
+})
+
 
 app.use((req, res, next) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
