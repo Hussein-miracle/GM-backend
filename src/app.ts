@@ -3,6 +3,7 @@
 import path from "path";
 import express from "express";
 import * as mongoose from "mongoose";
+import cors from 'cors';
 import chalk from "chalk";
 import socketConnection from "./socket.js";
 import { nanoid } from "nanoid";
@@ -18,6 +19,8 @@ const app = express();
 // console.log(process.env.NODE_ENV) 
 // console.log(path.resolve('../.env').replace(/\\/g,'/'))
 app.use(express.urlencoded({ extended: false }));
+
+app.use(cors());
 
 app.get('/',(req,res,next) => {
   res.status(200).json({
