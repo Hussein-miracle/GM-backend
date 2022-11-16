@@ -6,8 +6,8 @@
   "type": "module",
   "scripts": {
     "compile:ts": "tsc -w",
-    "dev": "nodemon dist/app.js",
-    "start": "node dist/app.js"
+    "dev": "nodemon src/app.ts",
+    "start": "node src/app.ts"
   },
   "keywords": [],
   "author": "",
