@@ -19,26 +19,16 @@ const app = express();
 // console.log(path.resolve('../.env').replace(/\\/g,'/'))
 app.use(express.urlencoded({ extended: false }));
 
-app.use(
-  (
-    req: any,
-    res: {
-      [x: string]: any;
-      setHeader: (arg0: string, arg1: string) => void;
-    },
-    next: () => void
-  ) => {
-    res.setHeader("Access-Control-Allow-Origin", "*");
-    res.setHeader("Access-Control-Allow-Headers", "Content-Type,Authorization");
-    res.setHeader("Access-Control-Allow-Methods", "GET,PUT,PATCH,DELETE,POST");
-    //THIS IS  ALLOWED TO LET ANY DOMAIN HAVE ACCESS TO OUR API EMDPINTS
-    // if(req/)
-    if (req.method === "OPTIONS") {
-      return res.sendStatus(200);
-    }
-    next();
-  }
-);
+
+app.use((req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader(
+    'Access-Control-Allow-Methods',
+    'OPTIONS, GET, POST, PUT, PATCH, DELETE'
+  );
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  next();
+});
 
 const init = () => {
   const server = app.listen(PORT, () => {
@@ -93,9 +83,9 @@ const init = () => {
           meetingId:savedMeeting._id,
         })
         participant.participants.push(user._id);
-
+ 
         await participant.save();  
-
+        console.log(savedMeeting , 'data sent to F.E') 
         socket.emit("meet-link-created", savedMeeting);
       }
     );
