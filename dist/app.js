@@ -24,22 +24,22 @@ const app = express();
 // console.log(path.resolve('../.env').replace(/\\/g,'/'))
 app.use(express.urlencoded({ extended: false }));
 app.use(cors());
-app.get('/', (req, res, next) => {
-    res.status(200).json({
-        state: 'connected',
-        message: 'How far,babyyy ⚡⚡😍😍  ',
-    });
-});
 app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'OPTIONS, GET, POST, PUT, PATCH, DELETE');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
     next();
 });
+app.get('/', (req, res, next) => {
+    res.status(200).json({
+        state: 'connected',
+        message: 'How far,babyyy ⚡⚡😍😍  ',
+    });
+});
 const init = () => {
     const server = app.listen(PORT, () => {
         console.log("          🛡️ 🛡️ 🛡️ 🛡️ 🛡️ 🛡️");
-        console.log(chalk.blueBright(`⚡⚡⚡Client connected on port: http://localhost:${PORT}⚡⚡⚡`));
+        console.log(chalk.blueBright(` ⚡⚡⚡Client connected on port: http://localhost:${PORT}⚡⚡⚡ `));
         console.log("          🛡️ 🛡️ 🛡️ 🛡️ 🛡️ 🛡️");
     });
     const connectionInstance = new socketConnection(server);
