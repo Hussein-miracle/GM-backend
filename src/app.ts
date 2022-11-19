@@ -20,7 +20,7 @@ const app = express();
 // console.log(path.resolve('../.env').replace(/\\/g,'/'))
 app.use(express.urlencoded({extended: false }));
 
-app.use(cors());
+// app.use(cors());
 
 
 app.use((req, res, next) => {
@@ -29,7 +29,7 @@ app.use((req, res, next) => {
     'Access-Control-Allow-Methods',
     'OPTIONS, GET, POST, PUT, PATCH, DELETE'
   );
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  // res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   next();
 });
 
@@ -51,6 +51,8 @@ const init = () => {
     );
     console.log("          🛡️ 🛡️ 🛡️ 🛡️ 🛡️ 🛡️");
   });
+
+
   const connectionInstance = new socketConnection(server);
   const io = connectionInstance.getIO();
 
@@ -96,8 +98,44 @@ const init = () => {
         participant.participants.push(user._id);
  
         await participant.save();  
-        console.log(savedMeeting , 'data sent to F.E') 
-        socket.emit("meet-link-created", savedMeeting);
+        //@ts-ignore
+        const meetingsData = {...savedMeeting._doc,currentMeetingId:savedMeeting._id } ;
+        //@ts-ignore
+        // savedMeeting.currentMeetingId = savedMeeting._id;
+        // console.log(savedMeeting , 'data sent to F.E') 
+        socket.emit("meet-link-created", meetingsData   );; 
+
+
+        socket.on('leave-meeting',async (person: any) => {
+          // console.log('see person wey wan leave meeting',person );
+          const {creator:{ _id:personId },meetingId} = person;
+          const user = await User.findOne({
+            _id: personId
+          });
+
+          console.log(user, ' user to pull from meeting . ')
+
+          // const meet = await Meeting.findOne({
+          //   _id:currentMeetingId,
+          // })
+ 
+          // const participantInMeet = await Participant.findOne({
+          //   meetingId:currentMeetingId,
+          // })
+
+
+          // if(participantInMeet){
+          //   // @ts-ignore
+          //   participantInMeet.participants.pull(personId);
+          // }
+
+          // if(user){
+          //   // @ts-ignore
+          //   user.meetings.pull(personId);          
+          // }
+
+
+        })
       }
     );
   });
