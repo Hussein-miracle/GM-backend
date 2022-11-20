@@ -3,7 +3,7 @@ dotenv.config();
 import path from "path";
 import express from "express";
 import * as mongoose from "mongoose";
-import cors from 'cors';
+import cors from "cors";
 import chalk from "chalk";
 import socketConnection from "./socket.js";
 import { nanoid } from "nanoid";
@@ -16,30 +16,28 @@ const PORT = process.env.PORT || 8000;
 const app = express();
 
 // app.use(bodyParser.json());
-console.log(process.env) 
+console.log(process.env);
 // console.log(path.resolve('../.env').replace(/\\/g,'/'))
-app.use(express.urlencoded({extended: false }));
+app.use(express.urlencoded({ extended: false }));
 
 // app.use(cors());
 
-
 app.use((req, res, next) => {
-  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader(
-    'Access-Control-Allow-Methods',
-    'OPTIONS, GET, POST, PUT, PATCH, DELETE'
+    "Access-Control-Allow-Methods",
+    "OPTIONS, GET, POST, PUT, PATCH, DELETE"
   );
   // res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   next();
 });
 
-
-app.get('/',(req,res,next) => {
+app.get("/", (req, res, next) => {
   res.status(200).json({
-    state:'connected',
-    message:'How far,babyyy ⚡⚡😍😍  ',
-  })
-})
+    state: "connected",
+    message: "How far,babyyy ⚡⚡😍😍  ",
+  });
+});
 
 const init = () => {
   const server = app.listen(PORT, () => {
@@ -51,7 +49,6 @@ const init = () => {
     );
     console.log("          🛡️ 🛡️ 🛡️ 🛡️ 🛡️ 🛡️");
   });
-
 
   const connectionInstance = new socketConnection(server);
   const io = connectionInstance.getIO();
@@ -65,15 +62,12 @@ const init = () => {
 
     socket.on(
       "create-meet-link",
-      async (data: {
-        meetCreator: boolean; name: string; settings: any 
-}) => {
-
-  console.log(data , 'data sent frm fe')
+      async (data: { meetCreator: boolean; name: string; settings: any }) => {
+        console.log(data, "data sent frm fe");
         const creatorName = data.name;
         const settings = data.settings;
         const meetCreator = data.meetCreator;
-        
+
         const meetUid = `${nanoid(3)}-${nanoid(4)}-${nanoid(3)}`.toLowerCase();
         // console.log(meetUid,'meetUid')
 
@@ -93,36 +87,58 @@ const init = () => {
         const savedMeeting = await meet.save();
         user.meetings.push(savedMeeting._id);
         const participant = new Participant({
-          meetingId:savedMeeting._id,
-        })
+          meetingId: savedMeeting._id,
+        });
         participant.participants.push(user._id);
- 
-        await participant.save();  
+
+        await participant.save();
+        const meetingsData = {
+          //@ts-ignore
+          ...savedMeeting._doc,
+          currentMeetingId: savedMeeting._id,
+        };
         //@ts-ignore
-        const meetingsData = {...savedMeeting._doc,currentMeetingId:savedMeeting._id } ;
-        //@ts-ignore
-        // savedMeeting.currentMeetingId = savedMeeting._id;
-        // console.log(savedMeeting , 'data sent to F.E') 
-        socket.emit("meet-link-created", meetingsData   );; 
+        socket.emit("meet-link-created", meetingsData);
+
+        socket.on('join-meet',(result:any) => {
+          const { name , settings , meetLink} = result;
+          const meetNeeded = Meeting.findOne({
+            link:meetLink,
+          })
+
+          if(meetNeeded){
+            console.log(meetNeeded , 'meetNeeded');
+            const joiner = new User({
+              name,
+              settings,
+              meetCreator:false,
+            })
 
 
-        socket.on('leave-meeting',async (person: any) => {
+          }
+
+        });
+
+        socket.on("leave-meeting", async (person: any) => {
           // console.log('see person wey wan leave meeting',person );
-          const {creator:{ _id:personId },meetingId} = person;
+          const {
+            creator: { _id: personId },
+            meetingId,
+          } = person;
+
           const user = await User.findOne({
-            _id: personId
+            _id: personId,
           });
 
-          console.log(user, ' user to pull from meeting . ')
+          console.log(user, " user to pull from meeting . ");
 
           // const meet = await Meeting.findOne({
           //   _id:currentMeetingId,
           // })
- 
+
           // const participantInMeet = await Participant.findOne({
           //   meetingId:currentMeetingId,
           // })
-
 
           // if(participantInMeet){
           //   // @ts-ignore
@@ -131,11 +147,9 @@ const init = () => {
 
           // if(user){
           //   // @ts-ignore
-          //   user.meetings.pull(personId);          
+          //   user.meetings.pull(personId);
           // }
-
-
-        })
+        });
       }
     );
   });
