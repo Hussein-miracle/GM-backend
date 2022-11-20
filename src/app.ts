@@ -1,5 +1,5 @@
-// import dotenv from "dotenv";
-// dotenv.config()
+import * as dotenv from "dotenv";
+dotenv.config();
 import path from "path";
 import express from "express";
 import * as mongoose from "mongoose";
@@ -16,7 +16,7 @@ const PORT = process.env.PORT || 8000;
 const app = express();
 
 // app.use(bodyParser.json());
-// console.log(process.env.NODE_ENV) 
+console.log(process.env) 
 // console.log(path.resolve('../.env').replace(/\\/g,'/'))
 app.use(express.urlencoded({extended: false }));
 

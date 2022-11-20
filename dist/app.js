@@ -7,6 +7,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+import * as dotenv from "dotenv";
+dotenv.config();
 import express from "express";
 import * as mongoose from "mongoose";
 import chalk from "chalk";
@@ -19,7 +21,7 @@ import Participant from "./models/participant.js";
 const PORT = process.env.PORT || 8000;
 const app = express();
 // app.use(bodyParser.json());
-// console.log(process.env.NODE_ENV) 
+console.log(process.env);
 // console.log(path.resolve('../.env').replace(/\\/g,'/'))
 app.use(express.urlencoded({ extended: false }));
 // app.use(cors());
