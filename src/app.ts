@@ -1,6 +1,6 @@
 import * as dotenv from "dotenv";
 dotenv.config();
-import path from "path";
+import path, { join } from "path";
 import express from "express";
 import * as mongoose from "mongoose";
 import cors from "cors";
@@ -16,7 +16,7 @@ const PORT = process.env.PORT || 8000;
 const app = express();
 
 // app.use(bodyParser.json());
-console.log(process.env);
+// console.log(process.env);
 // console.log(path.resolve('../.env').replace(/\\/g,'/'))
 app.use(express.urlencoded({ extended: false }));
 
@@ -58,12 +58,12 @@ const init = () => {
   io.on("connection", (socket: any) => {
     console.log(chalk.bgWhiteBright("omo person don connect"));
 
-    socket.emit("connected");
+    // socket.emit("connected");
 
     socket.on(
       "create-meet-link",
       async (data: { meetCreator: boolean; name: string; settings: any }) => {
-        console.log(data, "data sent frm fe");
+        // console.log(data, "data sent frm fe");
         const creatorName = data.name;
         const settings = data.settings;
         const meetCreator = data.meetCreator;
@@ -100,58 +100,81 @@ const init = () => {
         //@ts-ignore
         socket.emit("meet-link-created", meetingsData);
 
-        socket.on('join-meet',(result:any) => {
-          const { name , settings , meetLink} = result;
-          const meetNeeded = Meeting.findOne({
-            link:meetLink,
-          })
-
-          if(meetNeeded){
-            console.log(meetNeeded , 'meetNeeded');
-            const joiner = new User({
-              name,
-              settings,
-              meetCreator:false,
-            })
-
-
-          }
-
-        });
-
-        socket.on("leave-meeting", async (person: any) => {
-          // console.log('see person wey wan leave meeting',person );
-          const {
-            creator: { _id: personId },
-            meetingId,
-          } = person;
-
-          const user = await User.findOne({
-            _id: personId,
-          });
-
-          console.log(user, " user to pull from meeting . ");
-
-          // const meet = await Meeting.findOne({
-          //   _id:currentMeetingId,
-          // })
-
-          // const participantInMeet = await Participant.findOne({
-          //   meetingId:currentMeetingId,
-          // })
-
-          // if(participantInMeet){
-          //   // @ts-ignore
-          //   participantInMeet.participants.pull(personId);
-          // }
-
-          // if(user){
-          //   // @ts-ignore
-          //   user.meetings.pull(personId);
-          // }
-        });
       }
     );
+
+
+    
+    socket.on('join-meet', async  (result:any) => {
+      const { name , settings , meetLink} = result;
+      const meetNeeded = await Meeting.findOne({
+        link:meetLink,
+      })
+      
+      // console.log(meetNeeded , 'meetNeeded ');
+
+      if(meetNeeded){
+        const joiner = new User({
+          name,
+          settings,
+          meetCreator:false,
+        })
+        const savedJoiner = await joiner.save();
+        const participant = await Participant.findOne({meetingId:meetNeeded._id});
+
+        participant.participants.push(savedJoiner._id);
+
+        await participant.save();
+
+
+
+        const joinedData = {
+          //@ts-ignore
+          userData:{...savedJoiner._doc},
+          //@ts-ignore
+          meetData:{...meetNeeded._doc}
+
+        }
+
+        // console.log(joinedData , 'joinedData');
+        socket.emit('joined-meet',joinedData);
+      }
+
+    });
+
+    socket.on("leave-meeting", async (person: any) => {
+      // console.log('see person wey wan leave meeting',person );
+      const {
+        creator: { _id: personId },
+        meetingId,
+      } = person;
+
+      const user = await User.findOne({
+        _id: personId,
+      });
+
+      // console.log(user, " user to pull from meeting . ");
+
+      // const meet = await Meeting.findOne({
+      //   _id:meetingId,
+      // })
+
+
+
+      const participantInMeet = await Participant.findOne({
+        meetingId:meetingId,
+      })
+
+      if(participantInMeet){
+        // @ts-ignore
+        participantInMeet.participants.pull(personId);
+      }
+
+      if(user){
+        // @ts-ignore
+        user.meetings.pull(personId);
+      }
+    });
   });
 };
 

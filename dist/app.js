@@ -21,7 +21,7 @@ import Participant from "./models/participant.js";
 const PORT = process.env.PORT || 8000;
 const app = express();
 // app.use(bodyParser.json());
-console.log(process.env);
+// console.log(process.env);
 // console.log(path.resolve('../.env').replace(/\\/g,'/'))
 app.use(express.urlencoded({ extended: false }));
 // app.use(cors());
@@ -48,9 +48,9 @@ const init = () => {
     // Socket setup
     io.on("connection", (socket) => {
         console.log(chalk.bgWhiteBright("omo person don connect"));
-        socket.emit("connected");
+        // socket.emit("connected");
         socket.on("create-meet-link", (data) => __awaiter(void 0, void 0, void 0, function* () {
-            console.log(data, "data sent frm fe");
+            // console.log(data, "data sent frm fe");
             const creatorName = data.name;
             const settings = data.settings;
             const meetCreator = data.meetCreator;
@@ -76,42 +76,54 @@ const init = () => {
             const meetingsData = Object.assign(Object.assign({}, savedMeeting._doc), { currentMeetingId: savedMeeting._id });
             //@ts-ignore
             socket.emit("meet-link-created", meetingsData);
-            socket.on('join-meet', (result) => {
-                const { name, settings, meetLink } = result;
-                const meetNeeded = Meeting.findOne({
-                    link: meetLink,
-                });
-                if (meetNeeded) {
-                    console.log(meetNeeded, 'meetNeeded');
-                    const joiner = new User({
-                        name,
-                        settings,
-                        meetCreator: false,
-                    });
-                }
+        }));
+        socket.on('join-meet', (result) => __awaiter(void 0, void 0, void 0, function* () {
+            const { name, settings, meetLink } = result;
+            const meetNeeded = yield Meeting.findOne({
+                link: meetLink,
             });
-            socket.on("leave-meeting", (person) => __awaiter(void 0, void 0, void 0, function* () {
-                // console.log('see person wey wan leave meeting',person );
-                const { creator: { _id: personId }, meetingId, } = person;
-                const user = yield User.findOne({
-                    _id: personId,
+            // console.log(meetNeeded , 'meetNeeded ');
+            if (meetNeeded) {
+                const joiner = new User({
+                    name,
+                    settings,
+                    meetCreator: false,
                 });
-                console.log(user, " user to pull from meeting . ");
-                // const meet = await Meeting.findOne({
-                //   _id:currentMeetingId,
-                // })
-                // const participantInMeet = await Participant.findOne({
-                //   meetingId:currentMeetingId,
-                // })
-                // if(participantInMeet){
-                //   // @ts-ignore
-                //   participantInMeet.participants.pull(personId);
-                // }
-                // if(user){
-                //   // @ts-ignore
-                //   user.meetings.pull(personId);
-                // }
-            }));
+                const savedJoiner = yield joiner.save();
+                const participant = yield Participant.findOne({ meetingId: meetNeeded._id });
+                participant.participants.push(savedJoiner._id);
+                yield participant.save();
+                const joinedData = {
+                    //@ts-ignore
+                    userData: Object.assign({}, savedJoiner._doc),
+                    //@ts-ignore
+                    meetData: Object.assign({}, meetNeeded._doc)
+                };
+                // console.log(joinedData , 'joinedData');
+                socket.emit('joined-meet', joinedData);
+            }
+        }));
+        socket.on("leave-meeting", (person) => __awaiter(void 0, void 0, void 0, function* () {
+            // console.log('see person wey wan leave meeting',person );
+            const { creator: { _id: personId }, meetingId, } = person;
+            const user = yield User.findOne({
+                _id: personId,
+            });
+            // console.log(user, " user to pull from meeting . ");
+            // const meet = await Meeting.findOne({
+            //   _id:meetingId,
+            // })
+            const participantInMeet = yield Participant.findOne({
+                meetingId: meetingId,
+            });
+            if (participantInMeet) {
+                // @ts-ignore
+                participantInMeet.participants.pull(personId);
+            }
+            if (user) {
+                // @ts-ignore
+                user.meetings.pull(personId);
+            }
         }));
     });
 };
