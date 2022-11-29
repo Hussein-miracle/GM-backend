@@ -73,7 +73,10 @@ const init = () => {
             });
             participant.participants.push(user._id);
             yield participant.save();
-            const meetingsData = Object.assign(Object.assign({}, savedMeeting._doc), { currentMeetingId: savedMeeting._id });
+            const participants = yield Participant.find();
+            const meetingsData = Object.assign(Object.assign({}, savedMeeting._doc), { currentMeetingId: savedMeeting._id, 
+                //@ts-ignore
+                participants: Object.assign({}, participants._doc) });
             //@ts-ignore
             socket.emit("meet-link-created", meetingsData);
         }));
@@ -93,13 +96,27 @@ const init = () => {
                 const participant = yield Participant.findOne({ meetingId: meetNeeded._id });
                 participant.participants.push(savedJoiner._id);
                 yield participant.save();
+                const participants = yield Participant.find();
                 const joinedData = {
+                    status: 200,
                     //@ts-ignore
                     userData: Object.assign({}, savedJoiner._doc),
                     //@ts-ignore
-                    meetData: Object.assign({}, meetNeeded._doc)
+                    meetData: Object.assign({}, meetNeeded._doc),
+                    //@ts-ignore
+                    participants: Object.assign({}, participants._doc)
                 };
                 // console.log(joinedData , 'joinedData');
+                socket.emit('joined-meet', joinedData);
+            }
+            else {
+                const joinedData = {
+                    status: 404,
+                    message: 'Link not valid or it\'s been destroyed by creator',
+                    meetData: {
+                        link: meetLink,
+                    }
+                };
                 socket.emit('joined-meet', joinedData);
             }
         }));

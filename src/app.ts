@@ -92,10 +92,13 @@ const init = () => {
         participant.participants.push(user._id);
 
         await participant.save();
+        const participants = await Participant.find();
         const meetingsData = {
           //@ts-ignore
           ...savedMeeting._doc,
           currentMeetingId: savedMeeting._id,
+          //@ts-ignore
+          participants:{...participants._doc}
         };
         //@ts-ignore
         socket.emit("meet-link-created", meetingsData);
@@ -127,16 +130,30 @@ const init = () => {
         await participant.save();
 
 
+        const participants = await Participant.find();
+
 
         const joinedData = {
+          status:200,
           //@ts-ignore
           userData:{...savedJoiner._doc},
           //@ts-ignore
-          meetData:{...meetNeeded._doc}
-
+          meetData:{...meetNeeded._doc},
+          //@ts-ignore
+          participants:{...participants._doc  }
         }
 
         // console.log(joinedData , 'joinedData');
+        socket.emit('joined-meet',joinedData);
+      }else{
+        const joinedData = {
+          status:404,
+          message:'Link not valid or it\'s been destroyed by creator',
+          meetData:{
+            link:meetLink,
+          }
+
+        }
         socket.emit('joined-meet',joinedData);
       }
 
