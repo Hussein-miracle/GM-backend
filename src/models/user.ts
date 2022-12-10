@@ -6,9 +6,9 @@ const userSchema = new Schema({
     required: true,
     // unique: true,
   },
-  meetCreator:{
-    type:Boolean,    
-    default:false
+  meetCreator: {
+    type: Boolean,
+    default: false,
   },
   email: {
     type: String,
@@ -26,10 +26,10 @@ const userSchema = new Schema({
       type: Boolean,
       default: true,
     },
-    caption:{
+    caption: {
       type: Boolean,
       default: !true,
-    }
+    },
   },
   password: {
     type: String,
@@ -38,7 +38,23 @@ const userSchema = new Schema({
     {
       type: Schema.Types.ObjectId,
       ref: "Meeting",
-    }
+    },
+  ],
+  offers: [
+    {
+      sdp: String,
+      type: String,
+      userId: String,
+      meetingId: String,
+    },
+  ],
+  answers: [
+    {
+      sdp: String,
+      type: String,
+      userId: String,
+      meetingId: String,
+    },
   ],
 });
 

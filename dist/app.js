@@ -34,7 +34,7 @@ app.use((req, res, next) => {
 app.get("/", (req, res, next) => {
     res.status(200).json({
         state: "connected",
-        message: "How far,babyyy ⚡⚡😍😍  ",
+        message: "How far,babyyy ,shall we meet?⚡⚡😍😍  ",
     });
 });
 const init = () => {
@@ -89,7 +89,7 @@ const init = () => {
             const meetNeeded = yield Meeting.findOne({
                 link: meetLink,
             });
-            console.log(meetNeeded, 'meetNeeded ');
+            // console.log(meetNeeded , 'meetNeeded ');
             if (meetNeeded) {
                 const joiner = new User({
                     name,
@@ -104,11 +104,13 @@ const init = () => {
                     meetingId: meetNeeded._id
                 }).populate('participants');
                 // const participants = allParticipants.populate('participants');
-                console.log(participants, 'populate participants');
+                // console.log(participants , 'populate participants')
                 const joinedData = {
                     status: 200,
                     //@ts-ignore
-                    userData: Object.assign({}, savedJoiner._doc),
+                    joiner: Object.assign({}, savedJoiner._doc),
+                    link: meetLink,
+                    currentMeetingId: meetNeeded._id,
                     //@ts-ignore
                     meetData: Object.assign({}, meetNeeded._doc),
                     //@ts-ignore

@@ -35,7 +35,7 @@ app.use((req, res, next) => {
 app.get("/", (req, res, next) => {
   res.status(200).json({
     state: "connected",
-    message: "How far,babyyy ⚡⚡😍😍  ",
+    message: "How far,babyyy ,shall we meet?⚡⚡😍😍  ",
   });
 });
 
@@ -114,11 +114,12 @@ const init = () => {
     
     socket.on('join-meet', async  (result:any) => {
       const { name , settings , meetLink} = result;
+      
       const meetNeeded = await Meeting.findOne({
         link:meetLink,
       })
       
-      console.log(meetNeeded , 'meetNeeded ');
+      // console.log(meetNeeded , 'meetNeeded ');
 
       if(meetNeeded){
         const joiner = new User({
@@ -138,13 +139,17 @@ const init = () => {
           meetingId:meetNeeded._id
         }).populate('participants');
         // const participants = allParticipants.populate('participants');
-        console.log(participants , 'populate participants')
+        // console.log(participants , 'populate participants')
+
+      
 
 
         const joinedData = {
           status:200, 
           //@ts-ignore
-          userData:{...savedJoiner._doc},
+          joiner:{...savedJoiner._doc},
+          link:meetLink,
+          currentMeetingId: meetNeeded._id,
           //@ts-ignore
           meetData:{...meetNeeded._doc},
           //@ts-ignore

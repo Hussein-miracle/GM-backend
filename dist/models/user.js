@@ -7,7 +7,7 @@ const userSchema = new Schema({
     },
     meetCreator: {
         type: Boolean,
-        default: false
+        default: false,
     },
     email: {
         type: String,
@@ -28,7 +28,7 @@ const userSchema = new Schema({
         caption: {
             type: Boolean,
             default: !true,
-        }
+        },
     },
     password: {
         type: String,
@@ -37,7 +37,23 @@ const userSchema = new Schema({
         {
             type: Schema.Types.ObjectId,
             ref: "Meeting",
-        }
+        },
+    ],
+    offers: [
+        {
+            sdp: String,
+            type: String,
+            userId: String,
+            meetingId: String,
+        },
+    ],
+    answers: [
+        {
+            sdp: String,
+            type: String,
+            userId: String,
+            meetingId: String,
+        },
     ],
 });
 const userModel = model("User", userSchema);
