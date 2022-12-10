@@ -92,7 +92,11 @@ const init = () => {
         participant.participants.push(user._id);
 
         await participant.save();
-        const participants = await Participant.find();
+        const participants = await Participant.findOne({
+          meetingId:savedMeeting._id,
+        }).populate('participants');
+        // const participants = allParticipants.populate('participants');
+        console.log(participants , 'populate participants')
         const meetingsData = {
           //@ts-ignore
           ...savedMeeting._doc,
@@ -114,7 +118,7 @@ const init = () => {
         link:meetLink,
       })
       
-      // console.log(meetNeeded , 'meetNeeded ');
+      console.log(meetNeeded , 'meetNeeded ');
 
       if(meetNeeded){
         const joiner = new User({
@@ -130,17 +134,21 @@ const init = () => {
         await participant.save();
 
 
-        const participants = await Participant.find();
+        const participants = await Participant.findOne({
+          meetingId:meetNeeded._id
+        }).populate('participants');
+        // const participants = allParticipants.populate('participants');
+        console.log(participants , 'populate participants')
 
 
         const joinedData = {
-          status:200,
+          status:200, 
           //@ts-ignore
           userData:{...savedJoiner._doc},
           //@ts-ignore
           meetData:{...meetNeeded._doc},
           //@ts-ignore
-          participants:{...participants._doc  }
+          participants:{...participants._doc}
         }
 
         // console.log(joinedData , 'joinedData');
@@ -154,8 +162,8 @@ const init = () => {
           }
 
         }
-        socket.emit('joined-meet',joinedData);
-      }
+        socket.emit('joined-meet',joinedData); 
+      } 
 
     });
 

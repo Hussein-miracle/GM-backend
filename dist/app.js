@@ -73,7 +73,11 @@ const init = () => {
             });
             participant.participants.push(user._id);
             yield participant.save();
-            const participants = yield Participant.find();
+            const participants = yield Participant.findOne({
+                meetingId: savedMeeting._id,
+            }).populate('participants');
+            // const participants = allParticipants.populate('participants');
+            console.log(participants, 'populate participants');
             const meetingsData = Object.assign(Object.assign({}, savedMeeting._doc), { currentMeetingId: savedMeeting._id, 
                 //@ts-ignore
                 participants: Object.assign({}, participants._doc) });
@@ -85,7 +89,7 @@ const init = () => {
             const meetNeeded = yield Meeting.findOne({
                 link: meetLink,
             });
-            // console.log(meetNeeded , 'meetNeeded ');
+            console.log(meetNeeded, 'meetNeeded ');
             if (meetNeeded) {
                 const joiner = new User({
                     name,
@@ -96,7 +100,11 @@ const init = () => {
                 const participant = yield Participant.findOne({ meetingId: meetNeeded._id });
                 participant.participants.push(savedJoiner._id);
                 yield participant.save();
-                const participants = yield Participant.find();
+                const participants = yield Participant.findOne({
+                    meetingId: meetNeeded._id
+                }).populate('participants');
+                // const participants = allParticipants.populate('participants');
+                console.log(participants, 'populate participants');
                 const joinedData = {
                     status: 200,
                     //@ts-ignore
