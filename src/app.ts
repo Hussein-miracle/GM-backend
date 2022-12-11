@@ -70,6 +70,10 @@ const init = () => {
     socket.on("join-meet", (data:any) => {
       joinMeet(data,socket);
     });
+
+    socket.on('create-future-meet-link')
+
+
     socket.on("leave-meeting", async (person: any) => {
       // console.log('see person wey wan leave meeting',person );
       const {
