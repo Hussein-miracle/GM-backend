@@ -158,6 +158,7 @@ const init = () => {
 
         // console.log(joinedData , 'joinedData');
         socket.emit('joined-meet',joinedData);
+        socket.emit('update-joiners',{joiners:joinedData.participants});
       }else{
         const joinedData = {
           status:404,
@@ -171,6 +172,23 @@ const init = () => {
       } 
 
     });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     socket.on('update-settings' , async (data:any) => {
       const {userId,settingsUpdate} = data;
