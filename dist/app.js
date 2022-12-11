@@ -18,6 +18,7 @@ import User from "./models/user.js";
 import Participant from "./models/participant.js";
 import createLink from "./controllers/meetLink.js";
 import joinMeet from "./controllers/joinMeet.js";
+import createFutureLink from "./controllers/futureMeetLink.js";
 const PORT = process.env.PORT || 8000;
 const app = express();
 // app.use(bodyParser.json());
@@ -49,12 +50,15 @@ const init = () => {
     io.on("connection", (socket) => {
         console.log(chalk.bgWhiteBright("omo person don connect"));
         // socket.emit("connected");
-        socket.on("create-meet-link", (data) => {
-            createLink(data, socket);
-        });
-        socket.on("join-meet", (data) => {
-            joinMeet(data, socket);
-        });
+        socket.on("create-meet-link", (data) => __awaiter(void 0, void 0, void 0, function* () {
+            yield createLink(data, socket);
+        }));
+        socket.on("join-meet", (data) => __awaiter(void 0, void 0, void 0, function* () {
+            yield joinMeet(data, socket);
+        }));
+        socket.on('create-future-meet-link', (data) => __awaiter(void 0, void 0, void 0, function* () {
+            yield createFutureLink(data, socket);
+        }));
         socket.on("leave-meeting", (person) => __awaiter(void 0, void 0, void 0, function* () {
             // console.log('see person wey wan leave meeting',person );
             const { creator: { _id: personId }, meetingId, } = person;

@@ -14,6 +14,7 @@ import Participant from "./models/participant.js";
 
 import createLink from "./controllers/meetLink.js";
 import joinMeet from "./controllers/joinMeet.js";
+import createFutureLink from "./controllers/futureMeetLink.js";
 
 const PORT = process.env.PORT || 8000;
 const app = express();
@@ -63,15 +64,17 @@ const init = () => {
 
     // socket.emit("connected");
 
-    socket.on("create-meet-link", (data:any) => {
-      createLink(data,socket);
+    socket.on("create-meet-link",  async (data:any) => {
+      await createLink(data,socket);
     });
 
-    socket.on("join-meet", (data:any) => {
-      joinMeet(data,socket);
+    socket.on("join-meet", async(data:any) => {
+      await joinMeet(data,socket);
     });
 
-    socket.on('create-future-meet-link')
+    socket.on('create-future-meet-link', async (data:any) => {
+      await createFutureLink(data,socket);
+    })
 
 
     socket.on("leave-meeting", async (person: any) => {

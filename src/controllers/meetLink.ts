@@ -47,7 +47,7 @@ const createLink = async (data: { meetCreator: boolean; name: string; settings: 
     participants:{...participants._doc}
   };
   //@ts-ignore
-  socket.emit("meet-link-created", meetingsData);
+  socket.emit("meet-link-created", meetingsData );
 
 }
 
