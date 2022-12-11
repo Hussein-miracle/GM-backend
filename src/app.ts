@@ -158,7 +158,7 @@ const init = () => {
 
         // console.log(joinedData , 'joinedData');
         socket.emit('joined-meet',joinedData);
-        socket.emit('update-joiners',{joiners:joinedData.participants});
+        socket.broadcast.emit('update-joiners',{joiners:joinedData.participants  });
       }else{
         const joinedData = {
           status:404,

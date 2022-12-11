@@ -118,6 +118,7 @@ const init = () => {
                 };
                 // console.log(joinedData , 'joinedData');
                 socket.emit('joined-meet', joinedData);
+                socket.broadcast.emit('update-joiners', { joiners: joinedData.participants });
             }
             else {
                 const joinedData = {
