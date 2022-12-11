@@ -13,11 +13,11 @@ import express from "express";
 import * as mongoose from "mongoose";
 import chalk from "chalk";
 import socketConnection from "./socket.js";
-import { nanoid } from "nanoid";
 import { MONGO_DB_URI } from "./utils/constants.js";
-import Meeting from "./models/meeting.js";
 import User from "./models/user.js";
 import Participant from "./models/participant.js";
+import createLink from "./controllers/meetLink.js";
+import joinMeet from "./controllers/joinMeet.js";
 const PORT = process.env.PORT || 8000;
 const app = express();
 // app.use(bodyParser.json());
@@ -49,98 +49,12 @@ const init = () => {
     io.on("connection", (socket) => {
         console.log(chalk.bgWhiteBright("omo person don connect"));
         // socket.emit("connected");
-        socket.on("create-meet-link", (data) => __awaiter(void 0, void 0, void 0, function* () {
-            // console.log(data, "data sent frm fe");
-            const creatorName = data.name;
-            const settings = data.settings;
-            const meetCreator = data.meetCreator;
-            const meetUid = `${nanoid(3)}-${nanoid(4)}-${nanoid(3)}`.toLowerCase();
-            // console.log(meetUid,'meetUid')
-            const user = new User({
-                name: creatorName,
-                settings,
-                meetCreator,
-            });
-            const savedUser = yield user.save();
-            const meet = new Meeting({
-                creator: savedUser,
-                link: meetUid,
-            });
-            const savedMeeting = yield meet.save();
-            user.meetings.push(savedMeeting._id);
-            const participant = new Participant({
-                meetingId: savedMeeting._id,
-            });
-            participant.participants.push(user._id);
-            yield participant.save();
-            const participants = yield Participant.findOne({
-                meetingId: savedMeeting._id,
-            }).populate('participants');
-            // const participants = allParticipants.populate('participants');
-            console.log(participants, 'populate participants');
-            const meetingsData = Object.assign(Object.assign({}, savedMeeting._doc), { currentMeetingId: savedMeeting._id, 
-                //@ts-ignore
-                participants: Object.assign({}, participants._doc) });
-            //@ts-ignore
-            socket.emit("meet-link-created", meetingsData);
-        }));
-        socket.on('join-meet', (result) => __awaiter(void 0, void 0, void 0, function* () {
-            const { name, settings, meetLink } = result;
-            const meetNeeded = yield Meeting.findOne({
-                link: meetLink,
-            });
-            // console.log(meetNeeded , 'meetNeeded ');
-            if (meetNeeded) {
-                const joiner = new User({
-                    name,
-                    settings,
-                    meetCreator: false,
-                });
-                const savedJoiner = yield joiner.save();
-                const participant = yield Participant.findOne({ meetingId: meetNeeded._id });
-                participant.participants.push(savedJoiner._id);
-                yield participant.save();
-                const participants = yield Participant.findOne({
-                    meetingId: meetNeeded._id
-                }).populate('participants');
-                // const participants = allParticipants.populate('participants');
-                // console.log(participants , 'populate participants')
-                const joinedData = {
-                    status: 200,
-                    //@ts-ignore
-                    joiner: Object.assign({}, savedJoiner._doc),
-                    link: meetLink,
-                    currentMeetingId: meetNeeded._id,
-                    //@ts-ignore
-                    meetData: Object.assign({}, meetNeeded._doc),
-                    //@ts-ignore
-                    participants: Object.assign({}, participants._doc)
-                };
-                // console.log(joinedData , 'joinedData');
-                socket.emit('joined-meet', joinedData);
-                socket.broadcast.emit('update-joiners', { joiners: joinedData.participants });
-            }
-            else {
-                const joinedData = {
-                    status: 404,
-                    message: 'Link not valid or it\'s been destroyed by creator',
-                    meetData: {
-                        link: meetLink,
-                    }
-                };
-                socket.emit('joined-meet', joinedData);
-            }
-        }));
-        socket.on('update-settings', (data) => __awaiter(void 0, void 0, void 0, function* () {
-            const { userId, settingsUpdate } = data;
-            const user = yield User.findOne({
-                _id: userId
-            });
-            if (user) {
-                const update = yield User.updateOne({ _id: userId }, { settings: settingsUpdate });
-                socket.emit('updated-settings', update);
-            }
-        }));
+        socket.on("create-meet-link", (data) => {
+            createLink(data, socket);
+        });
+        socket.on("join-meet", (data) => {
+            joinMeet(data, socket);
+        });
         socket.on("leave-meeting", (person) => __awaiter(void 0, void 0, void 0, function* () {
             // console.log('see person wey wan leave meeting',person );
             const { creator: { _id: personId }, meetingId, } = person;
