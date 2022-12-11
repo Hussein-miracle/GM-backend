@@ -172,6 +172,18 @@ const init = () => {
 
     });
 
+    socket.on('update-settings' , async (data:any) => {
+      const {userId,settingsUpdate} = data;
+      const user = await User.findOne({
+        _id: userId
+      });
+
+      if(user){
+        const update = await User.updateOne({_id:userId},{settings:settingsUpdate});
+
+        socket.emit('updated-settings', update);
+      }
+    })
     socket.on("leave-meeting", async (person: any) => {
       // console.log('see person wey wan leave meeting',person );
       const {

@@ -130,6 +130,16 @@ const init = () => {
                 socket.emit('joined-meet', joinedData);
             }
         }));
+        socket.on('update-settings', (data) => __awaiter(void 0, void 0, void 0, function* () {
+            const { userId, settingsUpdate } = data;
+            const user = yield User.findOne({
+                _id: userId
+            });
+            if (user) {
+                const update = yield User.updateOne({ _id: userId }, { settings: settingsUpdate });
+                socket.emit('updated-settings', update);
+            }
+        }));
         socket.on("leave-meeting", (person) => __awaiter(void 0, void 0, void 0, function* () {
             // console.log('see person wey wan leave meeting',person );
             const { creator: { _id: personId }, meetingId, } = person;
