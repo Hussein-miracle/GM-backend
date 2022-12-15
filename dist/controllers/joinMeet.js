@@ -47,7 +47,9 @@ const joinMeet = (result, socket) => __awaiter(void 0, void 0, void 0, function*
         // console.log(joinedData , 'joinedData');
         socket.emit("joined-meet", joinedData);
         socket.broadcast.emit("update-joiners", {
-            joiners: joinedData.participants,
+            meetLink: joinedData.link,
+            currentMeetId: joinedData.currentMeetingId,
+            joiners: joinedData.participants.participants,
         });
     }
     else {

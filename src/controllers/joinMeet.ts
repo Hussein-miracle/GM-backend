@@ -37,7 +37,7 @@ const joinMeet = async (result: any,socket:Socket) => {
     const joinedData = {
       status: 200,
       //@ts-ignore
-      joiner: { ...savedJoiner._doc },
+      joiner: { ...savedJoiner._doc  },
       link: meetLink,
       currentMeetingId: meetNeeded._id,
       //@ts-ignore
@@ -49,7 +49,9 @@ const joinMeet = async (result: any,socket:Socket) => {
     // console.log(joinedData , 'joinedData');
     socket.emit("joined-meet", joinedData);
     socket.broadcast.emit("update-joiners", {
-      joiners: joinedData.participants,
+      meetLink:joinedData.link,
+      currentMeetId: joinedData.currentMeetingId,
+      joiners: joinedData.participants.participants,
     });
   } else {
     const joinedData = {
