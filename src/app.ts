@@ -27,7 +27,7 @@ app.use(express.urlencoded({ extended: false }));
 // app.use(cors());
 
 app.use((req, res, next) => {
-  res.setHeader("Access-Control-Allow-Origin",  "*" );
+  res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader(
     "Access-Control-Allow-Methods",
     "OPTIONS, GET, POST, PUT, PATCH, DELETE"
@@ -64,24 +64,24 @@ const init = () => {
 
     // socket.emit("connected");
 
-    socket.on("create-meet-link",  async (data:any) => {
-      await createLink(data,socket);
+    socket.on("create-meet-link", async (data: any) => {
+      await createLink(data, socket);
     });
 
-    socket.on("join-meet", async(data:any) => {
-      await joinMeet(data,socket);
+    socket.on("join-meet", async (data: any) => {
+      await joinMeet(data, socket);
     });
 
-    socket.on('create-future-meet-link', async (data:any) => {
-      await createFutureLink(data,socket);
-    })
-
+    socket.on("create-future-meet-link", async (data: any) => {
+      await createFutureLink(data, socket);
+    });
 
     socket.on("leave-meeting", async (person: any) => {
-      // console.log('see person wey wan leave meeting',person );
+      console.log("see person wey wan leave meeting", person);
       const {
         creator: { _id: personId },
         meetingId,
+        link,
       } = person;
 
       const user = await User.findOne({
@@ -95,18 +95,40 @@ const init = () => {
       // })
 
       const participantInMeet = await Participant.findOne({
-        meetingId: meetingId,
-      });
+        meetingId,
+      }).populate("participants");
+
+      // console.log(participantInMeet,'PM')
 
       if (participantInMeet) {
         // @ts-ignore
         participantInMeet.participants.pull(personId);
+        const participantIn = await participantInMeet.save();
+
+        console.log(participantIn, "PI");
+
+        if (user) {
+          // @ts-ignore
+          user.meetings.pull(meetingId);
+          const saveU = await user.save();
+          // console.log(saveU,'SU');
+        }
+
+        const data = {
+          meetLink: link,
+          currentMeetId: meetingId,
+          joiners: participantIn.participants,
+        };
+
+        // console.log(data, "dat");
+        socket.broadcast.emit("update-joiners",data);
       }
 
-      if (user) {
-        // @ts-ignore
-        user.meetings.pull(personId);
-      }
+      // socket.broadcast.emit("update-joiners", {
+      //   meetLink:joinedData.link,
+      //   currentMeetId: joinedData.currentMeetingId,
+      //   joiners: joinedData.participants.participants,
+      // });
     });
   });
 };

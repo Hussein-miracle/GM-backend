@@ -48,11 +48,14 @@ const joinMeet = async (result: any,socket:Socket) => {
 
     // console.log(joinedData , 'joinedData');
     socket.emit("joined-meet", joinedData);
+    
     socket.broadcast.emit("update-joiners", {
       meetLink:joinedData.link,
       currentMeetId: joinedData.currentMeetingId,
       joiners: joinedData.participants.participants,
     });
+
+
   } else {
     const joinedData = {
       status: 404,

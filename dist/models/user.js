@@ -27,7 +27,7 @@ const userSchema = new Schema({
         },
         caption: {
             type: Boolean,
-            default: !true,
+            default: false,
         },
     },
     password: {
