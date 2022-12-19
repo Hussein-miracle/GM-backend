@@ -122,6 +122,13 @@ const init = () => {
 
         // console.log(data, "dat");
         socket.broadcast.emit("update-joiners",data);
+
+        const del = await User.deleteOne({
+          _id:personId,
+        });
+
+        console.log(chalk.bgGreen('User leaving meet deleted') )
+
       }
 
       // socket.broadcast.emit("update-joiners", {
