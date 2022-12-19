@@ -127,7 +127,7 @@ const init = () => {
           _id:personId,
         });
 
-        console.log(chalk.bgGreen('User leaving meet deleted') )
+        console.log(chalk.bgGreen('User leaving meet deleted'))
 
       }
 
