@@ -5,7 +5,7 @@ const userSchema = new Schema({
     type: String,
     required: true,
     // unique: true,
-  },
+  }, 
   meetCreator: {
     type: Boolean,
     default: false,
@@ -48,6 +48,9 @@ const userSchema = new Schema({
       meetingId: String,
     },
   ],
+  offerCandidates: [
+
+  ],
   answers: [
     {
       sdp: String,
@@ -55,6 +58,9 @@ const userSchema = new Schema({
       userId: String,
       meetingId: String,
     },
+  ],
+  answerCandidates: [
+    
   ],
 });
 

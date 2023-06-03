@@ -47,6 +47,7 @@ const userSchema = new Schema({
             meetingId: String,
         },
     ],
+    offerCandidates: [],
     answers: [
         {
             sdp: String,
@@ -55,6 +56,7 @@ const userSchema = new Schema({
             meetingId: String,
         },
     ],
+    answerCandidates: [],
 });
 const userModel = model("User", userSchema);
 export default userModel;
