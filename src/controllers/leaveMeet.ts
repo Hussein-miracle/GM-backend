@@ -6,7 +6,7 @@ import Meeting from "../models/meeting.js";
 import User from "../models/user.js";
 import Participant from "../models/participant.js";
 
-const leaveMeet = async (person: any,socket:Socket) => {
+const leaveMeet = async (person: any,socket:Socket,room?:string) => {
   console.log("see person wey wan leave meeting", person);
   const {
     creator: { _id: personId },
@@ -61,15 +61,9 @@ const leaveMeet = async (person: any,socket:Socket) => {
 
 
 
-    console.log(chalk.bgGreen('User leaving meet deleted'))
-
+    console.log(chalk.bgGreen('User leaving meet deleted',person))
   }
 
-  // socket.broadcast.emit("update-joiners", {
-  //   meetLink:joinedData.link,
-  //   currentMeetId: joinedData.currentMeetingId,
-  //   joiners: joinedData.participants.participants,
-  // });
 }
 
 

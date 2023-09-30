@@ -1,15 +1,6 @@
 import mongoose from 'mongoose';
 const { Schema, model } = mongoose;
 export const offerSchema = new Schema({
-    sdp: {
-        type: String,
-        required: true,
-    },
-    type: {
-        type: String,
-        required: true,
-        default: 'offer'
-    },
     creatorId: {
         required: true,
         type: Schema.Types.ObjectId,
@@ -18,7 +9,15 @@ export const offerSchema = new Schema({
     meetingId: {
         ref: 'Meeting',
         type: Schema.Types.ObjectId,
-    }
+        required: true,
+    },
+    offerReceivers: [
+        {
+            required: true,
+            type: Schema.Types.ObjectId,
+            ref: 'User'
+        }
+    ]
 });
-const offerModel = model('offer', offerSchema);
-export default offerModel;
+const Offer = model('offer', offerSchema);
+export default Offer;

@@ -10,7 +10,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 import chalk from "chalk";
 import User from "../models/user.js";
 import Participant from "../models/participant.js";
-const leaveMeet = (person, socket) => __awaiter(void 0, void 0, void 0, function* () {
+const leaveMeet = (person, socket, room) => __awaiter(void 0, void 0, void 0, function* () {
     console.log("see person wey wan leave meeting", person);
     const { creator: { _id: personId }, meetingId, link, } = person;
     const user = yield User.findOne({
@@ -45,12 +45,7 @@ const leaveMeet = (person, socket) => __awaiter(void 0, void 0, void 0, function
         const del = yield User.deleteOne({
             _id: personId,
         });
-        console.log(chalk.bgGreen('User leaving meet deleted'));
+        console.log(chalk.bgGreen('User leaving meet deleted', person));
     }
-    // socket.broadcast.emit("update-joiners", {
-    //   meetLink:joinedData.link,
-    //   currentMeetId: joinedData.currentMeetingId,
-    //   joiners: joinedData.participants.participants,
-    // });
 });
 export default leaveMeet;

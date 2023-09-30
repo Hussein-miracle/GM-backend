@@ -10,7 +10,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 import Meeting from "../models/meeting.js";
 import User from "../models/user.js";
 import Participant from "../models/participant.js";
-const joinMeet = (result, socket) => __awaiter(void 0, void 0, void 0, function* () {
+import { SOCKET_EVENTS } from "../utils/constants.js";
+const joinMeet = (result, socket, room) => __awaiter(void 0, void 0, void 0, function* () {
+    console.log({ result });
     const { name, settings, meetLink } = result;
     const meetNeeded = yield Meeting.findOne({
         link: meetLink,
@@ -21,6 +23,7 @@ const joinMeet = (result, socket) => __awaiter(void 0, void 0, void 0, function*
             name,
             settings,
             meetCreator: false,
+            meetCreated: '',
         });
         const savedJoiner = yield joiner.save();
         const participant = yield Participant.findOne({
@@ -44,13 +47,16 @@ const joinMeet = (result, socket) => __awaiter(void 0, void 0, void 0, function*
             //@ts-ignore
             participants: Object.assign({}, participants._doc),
         };
+        // don't really understand this line below
+        socket.join(meetLink);
         // console.log(joinedData , 'joinedData');
-        socket.emit("joined-meet", joinedData);
-        socket.broadcast.emit("update-joiners", {
+        socket.emit(SOCKET_EVENTS.JOINED_MEET, joinedData);
+        const updateJoinersData = {
             meetLink: joinedData.link,
             currentMeetId: joinedData.currentMeetingId,
             joiners: joinedData.participants.participants,
-        });
+        };
+        socket.broadcast.emit(SOCKET_EVENTS.UPDATE_JOINERS, updateJoinersData);
     }
     else {
         const joinedData = {
@@ -60,7 +66,7 @@ const joinMeet = (result, socket) => __awaiter(void 0, void 0, void 0, function*
                 link: meetLink,
             },
         };
-        socket.emit("joined-meet", joinedData);
+        socket.emit(SOCKET_EVENTS.JOINED_MEET, joinedData);
     }
 });
 export default joinMeet;

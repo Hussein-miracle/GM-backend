@@ -5,10 +5,12 @@ export default class SocketConnection {
         //@ts-ignore
         this.io = new socketio.Server(server, {
             cors: {
-                origin: ["https://gm-clone-frontend-hussein-miracle.vercel.app", "https://gm-clone-frontend.vercel.app", 'https://gm-clone-frontend-git-shp-hussein-miracle.vercel.app/', 'http://localhost:3000'],
+                origin: '*',
                 // allowedHeaders: ["my-custom-header"],
                 // credentials: true, 
-                // methods:['get','post']
+                // methods:['get','post'],
+                // methods: ["GET", "POST"],
+                // credentials: true
             },
         });
     }

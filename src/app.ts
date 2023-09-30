@@ -7,12 +7,16 @@ import cors from "cors";
 import chalk from "chalk";
 
 import socketConnection from "./socket.js";
-import { MONGO_DB_URI } from "./utils/constants.js";
+import { MONGO_DB_URI } from "./utils/config.js";
 
 import createLink from "./controllers/meetLink.js";
 import joinMeet from "./controllers/joinMeet.js";
 import leaveMeet from "./controllers/leaveMeet.js";
 import createFutureLink from "./controllers/futureMeetLink.js";
+import { SOCKET_EVENTS } from "./utils/constants.js";
+import createOffer from "./controllers/createOffer.js";
+import createAnswer from "./controllers/createAnswer.js";
+import { Socket } from "socket.io";
 
 
 const PORT = process.env.PORT || 8000;
@@ -24,7 +28,6 @@ const app = express();
 // console.log(path.resolve('../.env').replace(/\\/g,'/'))
 app.use(express.urlencoded({ extended: false }));
 
-app.use(cors());
 
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
@@ -35,6 +38,7 @@ app.use((req, res, next) => {
   // res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   next();
 });
+app.use(cors());
 
 app.get("/", (req, res, next) => {
   res.status(200).json({
@@ -43,12 +47,13 @@ app.get("/", (req, res, next) => {
   });
 });
 
-const init = async () => {
+const init = () => {
+  let room:string;
   const server = app.listen(PORT, () => {
     console.log("          🛡️ 🛡️ 🛡️ 🛡️ 🛡️ 🛡️");
     console.log(
       chalk.blueBright(
-        ` ⚡⚡⚡Client connected on port: http://localhost:${PORT}⚡⚡⚡ `
+        ` ⚡⚡⚡connected on port: http://localhost:${PORT}⚡⚡⚡ `
       )
     );
     console.log("          🛡️ 🛡️ 🛡️ 🛡️ 🛡️ 🛡️");
@@ -59,26 +64,37 @@ const init = async () => {
 
   // Socket setup
 
-  io.on("connection", (socket: any) => {
-    console.log(socket.id,'sock')
-    console.log(chalk.bgWhiteBright("omo person don connect"));
+  io.on("connection", (socket: Socket) => {
+    room = socket.id;
+    console.log(chalk.bgWhiteBright("omo person don connect",room));
 
-    // socket.emit("connected");
-
-    socket.on("create-meet-link", async (data: any) => {
-      await createLink(data, socket);
+    socket.on(SOCKET_EVENTS.CREATE_MEET_LINK, async (data: any) => {
+      await createLink(data, socket,room);
     });
 
-    socket.on("join-meet", async (data: any) => {
-      await joinMeet(data, socket);
+    socket.on(SOCKET_EVENTS.JOIN_MEET, async (data: any) => {
+      await joinMeet(data, socket,room);
     });
 
-    socket.on("create-future-meet-link", async (data: any) => {
-      await createFutureLink(data, socket);
+    socket.on(SOCKET_EVENTS.CREATE_FUTURE_MEET_LINK, async (data: any) => {
+      await createFutureLink(data, socket,room);
     });
 
-    socket.on("leave-meeting", async (person: any) => {
-      await leaveMeet(person,socket);
+    socket.on(SOCKET_EVENTS.LEAVE_MEET, async (person: any) => {
+      await leaveMeet(person,socket,room);
+    })
+
+
+    socket.on(SOCKET_EVENTS.OFFER,async(person:any) => {
+      await  createOffer(person,socket,room);
+    })
+
+    socket.on(SOCKET_EVENTS.ANSWER,async(person:any)=> {
+      await createAnswer(person,socket,room);
+    })
+
+    socket.on(SOCKET_EVENTS.READY_FOR_PEERCONNECTION,async (data:any) => {
+      socket.broadcast.emit(SOCKET_EVENTS.CLIENTS_READY_FOR_PEERCONNECTION,data);
     })
   });
 };
@@ -88,7 +104,7 @@ const init = async () => {
 mongoose
   .connect(MONGO_DB_URI)
   .then(() => {
-    console.log(chalk.bgGreen("⚡⚡⚡"));
+    console.log(chalk.bgGreen(`⚡⚡⚡`));
     console.log(chalk.bgCyan("Connected to MONGO-DB"));
     console.log(chalk.bgBlackBright("⚡⚡⚡"));
     init();

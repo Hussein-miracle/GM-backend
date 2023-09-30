@@ -9,23 +9,27 @@ const userSchema = new Schema({
         type: Boolean,
         default: false,
     },
+    meetCreated: {
+        type: String,
+        // required: true,
+    },
     email: {
         type: String,
     },
     settings: {
-        screen: {
+        share_screen: {
             type: Boolean,
             default: false,
         },
-        voice: {
+        play_voice: {
             type: Boolean,
             default: false,
         },
-        cam: {
+        show_cam: {
             type: Boolean,
             default: true,
         },
-        caption: {
+        show_caption: {
             type: Boolean,
             default: false,
         },
@@ -41,22 +45,29 @@ const userSchema = new Schema({
     ],
     offers: [
         {
-            sdp: String,
-            type: String,
-            userId: String,
-            meetingId: String,
+            sessionDescription: {
+                sdp: { type: Schema.Types.Mixed },
+                type: { type: String }
+            },
+            userId: { type: String },
+            meetingId: { type: String },
         },
     ],
     offerCandidates: [],
     answers: [
         {
-            sdp: String,
-            type: String,
-            userId: String,
-            meetingId: String,
+            sessionDescription: {
+                sdp: { type: Schema.Types.Mixed },
+                type: { type: String }
+            },
+            userId: { type: String },
+            meetingId: { type: String },
         },
     ],
     answerCandidates: [],
+    peerConnection: {
+        type: Schema.Types.Mixed
+    }
 });
 const userModel = model("User", userSchema);
 export default userModel;

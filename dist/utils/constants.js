@@ -1,3 +1,23 @@
-import * as dotenv from "dotenv";
-dotenv.config();
-export const MONGO_DB_URI = `mongodb+srv://${process.env.MONGO_USERNAME}:${process.env.MONGO_PASSWORD}@cluster0.d96pl5j.mongodb.net/${process.env.MONGO_DATABASE}?retryWrites=true&w=majority`;
+export var SOCKET_EVENTS;
+(function (SOCKET_EVENTS) {
+    SOCKET_EVENTS["CREATE_MEET_LINK"] = "create-meet-link";
+    SOCKET_EVENTS["JOIN_MEET"] = "join-meet";
+    SOCKET_EVENTS["JOINED_MEET"] = "joined-meet";
+    SOCKET_EVENTS["CREATE_FUTURE_MEET_LINK"] = "create-future-meet-link";
+    SOCKET_EVENTS["LEAVE_MEET"] = "leave-meet";
+    SOCKET_EVENTS["UPDATE_JOINERS"] = "update-joiners";
+    SOCKET_EVENTS["MEET_LINK_CREATED"] = "meet-link-created";
+    SOCKET_EVENTS["OFFER"] = "offer";
+    SOCKET_EVENTS["OFFER_CREATED"] = "offer-created";
+    SOCKET_EVENTS["OFFER_CANDIDATE"] = "offer-candidate";
+    SOCKET_EVENTS["OFFER_CANDIDATE_CREATED"] = "offer-candidate-created";
+    SOCKET_EVENTS["CANDIDATE"] = "candidate";
+    SOCKET_EVENTS["CANDIDATE_CREATED"] = "candidate-created";
+    SOCKET_EVENTS["ANSWER"] = "answer";
+    SOCKET_EVENTS["ANSWER_CREATED"] = "answer-created";
+    SOCKET_EVENTS["ANSWER_CANDIDATE"] = "answer-candidate";
+    SOCKET_EVENTS["ANSWER_CANDIDATE_CREATED"] = "answer-candidate-created";
+    SOCKET_EVENTS["READY_FOR_PEERCONNECTION"] = "ready-for-peerconnection";
+    SOCKET_EVENTS["CLIENTS_READY_FOR_PEERCONNECTION"] = "clients-ready-for-peerconnection";
+})(SOCKET_EVENTS || (SOCKET_EVENTS = {}));
+export const CUSTOM_ALPHABETS = 'abcdefghijklmnopqrstuvwxyz';
