@@ -71,3 +71,11 @@ The application handles the following socket events:
 - Mongoose - MongoDB object modeling
 - TypeScript - Programming language
 - WebRTC - Peer-to-peer communication
+
+## Project Structure
+
+src/
+├── app.ts              # Main application file
+├── controllers/        # Socket event controllers
+├── utils/             # Utility functions and constants
+└── socket.js          # Socket.IO configuration
